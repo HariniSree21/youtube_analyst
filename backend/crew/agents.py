@@ -1,20 +1,20 @@
-
+# agents.py
 from crewai import Agent
-from backend.config import Config
+import os
+import litellm
 
-llm_config = {
-    "model": "gemini/gemini-1.5-pro",
-    "api_key": Config.GEMINI_API_KEY,
-    "base_url": "https://generativelanguage.googleapis.com",
-    "provider": "google"
-}
+# Load your GEMINI key
+litellm.api_key = os.getenv("GEMINI_API_KEY")
+
+# Use LiteLLM’s model string format:
+llm_model = "gemini/gemini-1.5-pro"
 
 content_analyst_agent = Agent(
     role="YouTube Content Analyst",
     goal="Identify patterns in top videos and summarize reasons for success",
     backstory="You're an expert YouTube content analyst who understands audience behavior and performance metrics.",
     verbose=True,
-    llm_config=llm_config
+    llm=llm_model
 )
 
 strategy_advisor_agent = Agent(
@@ -22,5 +22,5 @@ strategy_advisor_agent = Agent(
     goal="Generate personalized recommendations to grow the channel",
     backstory="You help YouTube creators grow using SEO, trends, and consistency.",
     verbose=True,
-    llm_config=llm_config
+    llm=llm_model
 )
