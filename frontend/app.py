@@ -83,27 +83,27 @@ if st.button("Compare Channels"):
             })
 
         if comp_response.status_code == 200:
-            comps = comp_response.json()
+            result = comp_response.json()
+            comps = result.get("comparisons", [])
+            growth_tip = result.get("growth_advice")
 
             st.success("✅ Comparison Ready!")
 
-            # Channel Comparison
             st.write("### 📊 Channel Comparison Table")
-            display_comparison_table(comps["comparisons"])
+            display_comparison_table(comps)
 
             st.write("### 📈 Subscribers")
-            plot_bar_comparison(comps["comparisons"], metric="subscribers")
+            plot_bar_comparison(comps, metric="subscribers")
 
             st.write("### 🎥 Total Views")
-            plot_bar_comparison(comps["comparisons"], metric="total_views")
+            plot_bar_comparison(comps, metric="total_views")
 
             st.write("### 📹 Video Count")
-            plot_bar_comparison(comps["comparisons"], metric="video_count")
+            plot_bar_comparison(comps, metric="video_count")
 
-            # ✅ Optional Growth Insights if same domain
-            if "growth_insight" in comps and comps["growth_insight"]:
-                st.write("### 🌱 Growth Suggestions (Based on Same Domain)")
-                st.markdown(comps["growth_insight"])
+            if growth_tip:
+                st.write("### 💡 Growth Opportunity (AI)")
+                st.markdown(growth_tip)
 
         else:
             st.error("❌ Failed to compare channels. Please check both URLs and try again.")

@@ -17,29 +17,28 @@ class ChannelRequest(BaseModel):
 class CompareRequest(BaseModel):
     channels: List[str]
 
+
 @app.post("/compare_channels")
 def compare_channels(request: CompareRequest):
     try:
         if len(request.channels) != 2:
-            raise HTTPException(status_code=400, detail="Exactly 2 channel URLs are required.")
+            raise ValueError("Please provide exactly two channel URLs.")
 
         # Get data for both channels
-        channel1 = get_channel_analysis(request.channels[0])
-        channel2 = get_channel_analysis(request.channels[1])
+        ch1_data = get_channel_analysis(request.channels[0])
+        ch2_data = get_channel_analysis(request.channels[1])
 
-        # Run growth agent if similar domain
-        growth_output = run_growth_agent_if_same_domain(channel1, channel2)
+        # ✅ Run growth agent if they are from same domain
+        growth_output = run_growth_agent_if_same_domain(ch1_data, ch2_data)
 
-        # Return comparison + optional growth advice
         return {
-            "comparison": [channel1, channel2],
-            "growth_advice": growth_output if growth_output else None
+            "comparisons": [ch1_data, ch2_data],
+            "growth_advice": growth_output  # Add growth advice to response
         }
 
     except Exception as e:
         print("❌ Compare error:", e)
         raise HTTPException(status_code=500, detail=str(e))
-
 @app.post("/analyze_channel")
 def analyze_channel(request: ChannelRequest):
     try:

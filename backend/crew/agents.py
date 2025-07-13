@@ -12,7 +12,8 @@ growth_recommendation_agent = Agent(
     role="Growth Strategist",
     goal="Help content creators grow by learning from successful channels in the same domain",
     backstory="You are an expert at benchmarking and identifying growth gaps between similar YouTube channels.",
-    verbose=True
+    verbose=True,
+    llm=llm_model
 )
 content_analyst_agent = Agent(
     role="YouTube Content Analyst",
