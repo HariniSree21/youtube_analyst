@@ -6,9 +6,14 @@ import litellm
 # Load your GEMINI key
 litellm.api_key = os.getenv("GEMINI_API_KEY")
 
-# Use LiteLLM’s model string format:
+# Use LiteLLM’s model Astring format:
 llm_model = "gemini/gemini-1.5-pro"
-
+growth_recommendation_agent = Agent(
+    role="Growth Strategist",
+    goal="Help content creators grow by learning from successful channels in the same domain",
+    backstory="You are an expert at benchmarking and identifying growth gaps between similar YouTube channels.",
+    verbose=True
+)
 content_analyst_agent = Agent(
     role="YouTube Content Analyst",
     goal="Identify patterns in top videos and summarize reasons for success",

@@ -1,65 +1,69 @@
 import streamlit as st
 import requests
+import os
 from frontend_utils import display_comparison_table, plot_bar_comparison
 
-API_URL = "http://localhost:8000"  # Update if deployed remotely
+API_URL = "http://localhost:8000"  # Change if deployed remotely
 
 st.set_page_config(page_title="YouTube Analyzer", page_icon="📊", layout="centered")
 
 st.title("📊 YouTube Channel Analyzer")
 st.write("Enter a YouTube channel URL below to get AI-powered insights from your favorite creators!")
 
-# --- Channel Analysis Section ---
+# --- Analyze Single Channel ---
 st.subheader("🔍 Analyze a Channel")
 
 channel_url = st.text_input("YouTube Channel URL")
 email = st.text_input("Your Email (optional)", value="anonymous@example.com")
 
 if st.button("Analyze"):
-    with st.spinner("Analyzing channel..."):
-        response = requests.post(f"{API_URL}/analyze_channel", json={
-            "channel_url": channel_url,
-            "user_email": email
-        })
+    if not channel_url:
+        st.warning("Please enter a valid YouTube channel URL.")
+    else:
+        with st.spinner("Analyzing channel..."):
+            response = requests.post(f"{API_URL}/analyze_channel", json={
+                "channel_url": channel_url,
+                "user_email": email
+            })
 
         if response.status_code == 200:
             data = response.json()
+            stats = data.get("channel_stats", {})
+            ai = data.get("ai_recommendations", {})
 
             st.success("✅ Analysis complete!")
 
-            # Channel stats
-            stats = data["channel_stats"]
-            st.write(f"**Channel Name:** {stats['channel_name']}")
-            st.write(f"**Subscribers:** {stats['subscribers']}")
-            st.write(f"**Total Views:** {stats['total_views']}")
-            st.write(f"**Video Count:** {stats['video_count']}")
+            st.write(f"**Channel Name:** {stats.get('channel_name', '-')}")
+            st.write(f"**Subscribers:** {stats.get('subscribers', '-')}")
+            st.write(f"**Total Views:** {stats.get('total_views', '-')}")
+            st.write(f"**Video Count:** {stats.get('video_count', '-')}")
 
-            # Top Videos
             st.write("### 🏆 Top Videos")
-            for v in stats["top_videos"]:
-                st.markdown(f"- **{v['title']}** — {v['views']} views, {v['likes']} likes")
+            for v in stats.get("top_videos", []):
+                st.markdown(f"- **{v['title']}** — {v['views']} views, {v['likes']} likes, {v['comments']} comments")
 
-            # AI Insights
-            ai = data["ai_recommendations"]
             st.write("### 🧠 Content Analysis")
-            st.markdown(ai["content_analysis"])
+            st.markdown(ai.get("content_analysis", "No content analysis available."))
 
             st.write("### 🚀 Strategy Recommendations")
-            st.markdown(ai["strategy_recommendations"])
+            st.markdown(ai.get("strategy_recommendations", "No recommendations available."))
 
             # PDF Download
-            with open(data["pdf_path"], "rb") as f:
-                st.download_button(
-                    label="📄 Download Report as PDF",
-                    data=f,
-                    file_name=data["pdf_path"].split("/")[-1],
-                    mime="application/pdf"
-                )
-
+            pdf_path = data.get("pdf_path")
+            if pdf_path and os.path.exists(pdf_path):
+                with open(pdf_path, "rb") as f:
+                    st.download_button(
+                        label="📄 Download Report as PDF",
+                        data=f,
+                        file_name=os.path.basename(pdf_path),
+                        mime="application/pdf"
+                    )
+            else:
+                st.warning("⚠️ PDF report not found or not generated.")
         else:
-            st.error("❌ Something went wrong. Please check the channel URL or try again.")
+            st.error(f"❌ Error: {response.status_code} - {response.json().get('detail')}")
 
-# --- Channel Comparison Section ---
+# --- Compare Two Channels ---
 st.divider()
 st.subheader("⚔️ Compare Two Channels")
 
@@ -70,27 +74,36 @@ with col2:
     ch2 = st.text_input("Channel 2 URL")
 
 if st.button("Compare Channels"):
-    with st.spinner("Comparing..."):
-        comp_response = requests.post(f"{API_URL}/compare_channels", json={
-            "channels": [ch1, ch2]
-        })
+    if not ch1 or not ch2:
+        st.warning("Please enter both channel URLs.")
+    else:
+        with st.spinner("Comparing channels..."):
+            comp_response = requests.post(f"{API_URL}/compare_channels", json={
+                "channels": [ch1, ch2]
+            })
 
         if comp_response.status_code == 200:
             comps = comp_response.json()
 
             st.success("✅ Comparison Ready!")
 
+            # Channel Comparison
             st.write("### 📊 Channel Comparison Table")
-            display_comparison_table(comps)
+            display_comparison_table(comps["comparisons"])
 
             st.write("### 📈 Subscribers")
-            plot_bar_comparison(comps, metric="subscribers")
+            plot_bar_comparison(comps["comparisons"], metric="subscribers")
 
             st.write("### 🎥 Total Views")
-            plot_bar_comparison(comps, metric="total_views")
+            plot_bar_comparison(comps["comparisons"], metric="total_views")
 
             st.write("### 📹 Video Count")
-            plot_bar_comparison(comps, metric="video_count")
+            plot_bar_comparison(comps["comparisons"], metric="video_count")
+
+            # ✅ Optional Growth Insights if same domain
+            if "growth_insight" in comps and comps["growth_insight"]:
+                st.write("### 🌱 Growth Suggestions (Based on Same Domain)")
+                st.markdown(comps["growth_insight"])
 
         else:
-            st.error("❌ Failed to compare channels. Please check both URLs.")
+            st.error("❌ Failed to compare channels. Please check both URLs and try again.")

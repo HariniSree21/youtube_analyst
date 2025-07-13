@@ -1,6 +1,16 @@
 from crewai import Task
 from backend.crew.agents import content_analyst_agent, strategy_advisor_agent
 
+def generate_growth_task(weaker_channel, stronger_channel):
+    return Task(
+        description=(
+            f"Analyze the performance of '{weaker_channel['channel_name']}' and compare it to the stronger channel "
+            f"'{stronger_channel['channel_name']}'. Based on content, frequency, video types, and audience engagement, "
+            f"provide clear growth recommendations for the weaker channel to reach or surpass the success of the stronger one."
+        ),
+        expected_output="A detailed strategy for growth tailored to the weaker channel.",
+        agent=growth_recommendation_agent,
+    )
 def content_analysis_task(channel_data):
     return Task(
         description=f"""
