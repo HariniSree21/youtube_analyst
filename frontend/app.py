@@ -1,7 +1,8 @@
 import streamlit as st
 import requests
 import os
-from frontend_utils import display_comparison_table, plot_bar_comparison
+import pandas as pd
+from frontend_utils import plot_bar_comparison
 
 API_URL = "http://localhost:8000"  # Change if deployed remotely
 
@@ -85,12 +86,25 @@ if st.button("Compare Channels"):
         if comp_response.status_code == 200:
             result = comp_response.json()
             comps = result.get("comparisons", [])
-            growth_tip = result.get("growth_advice")
+            growth_tip = result.get("growth_advice", {})
 
             st.success("✅ Comparison Ready!")
 
             st.write("### 📊 Channel Comparison Table")
-            display_comparison_table(comps)
+
+            # Convert to DataFrame with list/dict columns as strings to avoid ArrowTypeError
+            comps_cleaned = []
+            for item in comps:
+                cleaned_item = {}
+                for k, v in item.items():
+                    if isinstance(v, (list, dict)):
+                        cleaned_item[k] = str(v)
+                    else:
+                        cleaned_item[k] = v
+                comps_cleaned.append(cleaned_item)
+
+            df = pd.DataFrame(comps_cleaned)
+            st.dataframe(df)
 
             st.write("### 📈 Subscribers")
             plot_bar_comparison(comps, metric="subscribers")
@@ -103,7 +117,15 @@ if st.button("Compare Channels"):
 
             if growth_tip:
                 st.write("### 💡 Growth Opportunity (AI)")
-                st.markdown(growth_tip)
+
+                summary = growth_tip.get("summary", "")
+                recommendations = growth_tip.get("recommendations", "")
+
+                if summary:
+                    st.write(f"**Summary:** {summary}")
+
+                if recommendations:
+                    st.markdown(recommendations)
 
         else:
             st.error("❌ Failed to compare channels. Please check both URLs and try again.")

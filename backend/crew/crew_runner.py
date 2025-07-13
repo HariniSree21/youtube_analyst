@@ -34,6 +34,10 @@ def run_agents_on_channel(channel_data):
 
 # ✅ Fixed version
 def run_growth_agent_if_same_domain(channel1, channel2):
+    from backend.crew.tasks import generate_growth_task
+    from backend.crew.agents import growth_recommendation_agent
+    from crewai import Crew
+
     # Rough similarity check using description keyword overlap
     desc1 = set(channel1.get("description", "").lower().split())
     desc2 = set(channel2.get("description", "").lower().split())
@@ -54,6 +58,30 @@ def run_growth_agent_if_same_domain(channel1, channel2):
             tasks=[growth_task],
             verbose=True
         )
-        return crew.kickoff()
+        output = crew.kickoff()
 
-    return None  # No growth recommendation for unrelated domains
+        # ✅ Normalize output to structured dict for frontend
+        if isinstance(output, dict):
+            # Already structured, return as is
+            return output
+
+        elif isinstance(output, str):
+            # If string, treat first line as summary, rest as recommendations
+            lines = output.strip().split("\n")
+            summary = lines[0] if lines else "Growth Opportunity Generated"
+            recommendations = "\n".join(lines[1:]) if len(lines) > 1 else ""
+
+            return {
+                "summary": summary,
+                "recommendations": recommendations
+            }
+
+        else:
+            # Unexpected output type
+            return {
+                "summary": "Growth analysis completed.",
+                "recommendations": str(output)
+            }
+
+    # If not similar domains, return None to skip growth suggestion
+    return None

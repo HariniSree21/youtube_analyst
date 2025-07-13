@@ -1,12 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
-from backend.crew.crew_runner import run_growth_agent_if_same_domain
-
-from backend.crew.crew_runner import run_agents_on_channel
+from backend.crew.crew_runner import run_growth_agent_if_same_domain, run_agents_on_channel
 from backend.services.youtube_service import get_channel_analysis
 from backend.utils.pdf_generator import generate_pdf
-
 import os
 
 app = FastAPI()
@@ -31,14 +28,22 @@ def compare_channels(request: CompareRequest):
         # ✅ Run growth agent if they are from same domain
         growth_output = run_growth_agent_if_same_domain(ch1_data, ch2_data)
 
+        # Ensure growth_output is dict for frontend
+        if isinstance(growth_output, str):
+            growth_output = {"summary": growth_output, "recommendations": ""}
+        elif growth_output is None:
+            growth_output = {"summary": "No growth opportunity.", "recommendations": ""}
+
         return {
             "comparisons": [ch1_data, ch2_data],
-            "growth_advice": growth_output  # Add growth advice to response
+            "growth_advice": growth_output
         }
 
     except Exception as e:
         print("❌ Compare error:", e)
         raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/analyze_channel")
 def analyze_channel(request: ChannelRequest):
     try:
@@ -71,7 +76,7 @@ def analyze_channel(request: ChannelRequest):
                 "content_analysis": content_analysis,
                 "strategy_recommendations": strategy_recommendations
             },
-            "pdf_path": os.path.abspath(pdf_path)  # Ensure it's full path
+            "pdf_path": os.path.abspath(pdf_path)
         }
 
     except Exception as e:
