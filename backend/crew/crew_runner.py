@@ -20,7 +20,8 @@ def run_agents_on_channel(channel_data):
         verbose=True
     )
 
-    results = crew.run()
+    results = crew.kickoff()
+
 
     return {
         "content_analysis": results[0],  # Output from content analyst
