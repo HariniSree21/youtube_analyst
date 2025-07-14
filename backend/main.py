@@ -5,6 +5,7 @@ from backend.crew.crew_runner import run_growth_agent_if_same_domain, run_agents
 from backend.services.youtube_service import get_channel_analysis
 from backend.utils.pdf_generator import generate_pdf
 import os
+from backend.utils.growth_agent_runner import run_in_subprocess
 
 app = FastAPI()
 
