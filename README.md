@@ -14,7 +14,7 @@ An AI-powered tool that analyzes YouTube channels using the YouTube Data API. It
 - ✅ Compare two YouTube channels
 
 ---
-
+```
 ## 🗂️ Project Structure
 📁 backend/
 │ ├── db/
@@ -33,6 +33,7 @@ An AI-powered tool that analyzes YouTube channels using the YouTube Data API. It
 📄 .env # Secrets (API keys, DB config)
 📄 docker-compose.yml
 📄 README.md
+```
 ---
 
 ##✅ backend/requirements.txt
@@ -69,7 +70,7 @@ matplotlib  # (if you’re using charts)
 
 Create a `.env` file in the **project root**:
 
-"""env
+```env
 YOUTUBE_API_KEY=your_youtube_api_key
 GEMINI_API_KEY=your_gemini_api_key  # or use OPENAI_API_KEY
 PGUSER=your_pg_user
@@ -77,6 +78,7 @@ PGPASSWORD=your_pg_password
 PGHOST=your_pg_host
 PGDATABASE=your_database_name
 PGSSLMODE=require"""
+```
 ---
 
 ##🐳 Run with Docker
