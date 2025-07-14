@@ -1,5 +1,5 @@
 import multiprocessing
-from backend.crew.crew_runner import run_growth_agent_if_same_domain
+from crew.crew_runner import run_growth_agent_if_same_domain
 
 def run_in_subprocess(ch1_data, ch2_data):
     manager = multiprocessing.Manager()

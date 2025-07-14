@@ -2,10 +2,10 @@
 
 import os
 from googleapiclient.discovery import build
-from backend.config import Config
+from config import Config
 API_KEY = Config.YOUTUBE_API_KEY
-
-youtube = build("youtube", "v3", developerKey=API_KEY)
+from google.auth.credentials import AnonymousCredentials
+youtube =build("youtube", "v3", credentials=AnonymousCredentials(), developerKey=API_KEY)
 
 def extract_channel_id(channel_url):
     """Extracts channel ID from full URL if needed"""

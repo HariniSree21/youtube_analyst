@@ -3,8 +3,9 @@ import requests
 import os
 import pandas as pd
 from frontend_utils import plot_bar_comparison
+import os
+API_URL = os.getenv("API_URL", "http://backend:8000")
 
-API_URL = "http://localhost:8000"
 
 # Page config
 st.set_page_config(page_title="YouTube Analyzer", page_icon="📊", layout="wide")
@@ -62,7 +63,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---- App Title ----
-st.markdown('<div class="main-title">📊 YouTube Channel Analyzer Pro</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">📊 YouTube Channel Analyzer </div>', unsafe_allow_html=True)
 st.caption("AI-powered insights, growth recommendations, and visual analytics for YouTube channels.")
 
 # -------------------------

@@ -1,5 +1,5 @@
 from crewai import Task
-from backend.crew.agents import content_analyst_agent, strategy_advisor_agent,growth_recommendation_agent
+from crew.agents import content_analyst_agent, strategy_advisor_agent,growth_recommendation_agent
 
 def generate_growth_task(weaker_channel, stronger_channel):
     return Task(
