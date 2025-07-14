@@ -2,7 +2,7 @@
 
 import os
 from googleapiclient.discovery import build
-from config import Config
+from backend.config import Config
 API_KEY = Config.YOUTUBE_API_KEY
 from google.auth.credentials import AnonymousCredentials
 youtube =build("youtube", "v3", credentials=AnonymousCredentials(), developerKey=API_KEY)

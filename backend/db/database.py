@@ -2,8 +2,8 @@
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from db.models import Base
-from config import Config
+from backend.db.models import Base
+from backend.config import Config
 
 DATABASE_URL = Config.DATABASE_URL
 

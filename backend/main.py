@@ -1,11 +1,11 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
-from crew.crew_runner import run_growth_agent_if_same_domain, run_agents_on_channel
-from services.youtube_service import get_channel_analysis
-from utils.pdf_generator import generate_pdf
+from backend.crew.crew_runner import run_growth_agent_if_same_domain, run_agents_on_channel
+from backend.services.youtube_service import get_channel_analysis
+from backend.utils.pdf_generator import generate_pdf
+from backend.utils.growth_agent_runner import run_in_subprocess
 import os
-from utils.growth_agent_runner import run_in_subprocess
 from fastapi.responses import FileResponse
 app = FastAPI()
 

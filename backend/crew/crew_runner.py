@@ -1,10 +1,10 @@
 from crewai import Crew
-from crew.tasks import (
+from backend.crew.tasks import (
     content_analysis_task,
     strategy_recommendation_task,
     generate_growth_task  # ✅ new import
 )
-from crew.agents import (
+from backend.crew.agents import (
     content_analyst_agent,
     strategy_advisor_agent,
   
