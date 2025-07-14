@@ -52,8 +52,8 @@ openai  # or use 'google-generativeai' if you're using Gemini
 
 ##✅ frontend/requirements.txt
 ```
-txt
-Copy code
+
+
 streamlit
 requests
 pandas
@@ -86,7 +86,7 @@ PGSSLMODE=require"""
 
 ##🐳 Run with Docker
 ```
-bash
+
 docker-compose up --build
 ```
 ---
@@ -94,7 +94,7 @@ docker-compose up --build
 ##🧪 Run Locally Without Docker
 ```
 ▶️ Backend (FastAPI)
-bash
+
 cd backend
 pip install -r requirements.txt
 uvicorn main:app --reload
@@ -103,7 +103,7 @@ uvicorn main:app --reload
 
 🖥️ Frontend (Streamlit)
 ```
-bash
+
 
 cd frontend
 pip install -r requirements.txt
