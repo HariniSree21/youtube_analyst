@@ -190,5 +190,59 @@ YOUTUBE_API_KEY=your_actual_youtube_api_key
 GEMINI_API_KEY=your_actual_gemini_api_key
 Your backend will load this securely using python-dotenv
 ```
+##To use pgEdge (a distributed Postgres-compatible database) in your project, you’ll first need to sign up, create a database, and get connection credentials. Here's a step-by-step guide:
+---
+```
+🛠️ How to Set Up pgEdge
+✅ 1. Sign Up on pgEdge Cloud
+Go to: https://cloud.pgedge.com
 
+Create an account (free tier available)
 
+Verify your email and log in
+
+✅ 2. Create a Cluster
+In the pgEdge Cloud Console:
+
+Click “Create Cluster”
+
+Choose your region (e.g., us-east-1)
+
+Select a name like youtube-analyzer-db
+
+Select Single Region (unless you want geo-replication)
+
+Click Create
+
+✅ 3. Get Database Credentials
+After cluster creation:
+
+Click on your cluster
+
+Go to “Connection Info”
+
+You'll get:
+
+host
+
+database
+
+username
+
+password
+
+port (default is 5432)
+
+sslmode (use require)
+
+Copy these values into your .env file like this:
+
+env
+Copy
+Edit
+PGUSER=your_pg_username
+PGPASSWORD=your_pg_password
+PGHOST=your_cluster_host
+PGDATABASE=your_database_name
+PGSSLMODE=require
+```
