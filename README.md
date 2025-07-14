@@ -33,6 +33,8 @@ An AI-powered tool that analyzes YouTube channels using the YouTube Data API. It
 📄 .env # Secrets (API keys, DB config)
 📄 docker-compose.yml
 📄 README.md
+---
+
 ##✅ backend/requirements.txt
 txt
 Copy code
@@ -43,6 +45,8 @@ python-dotenv
 google-api-python-client
 fpdf
 openai  # or use 'google-generativeai' if you're using Gemini
+---
+
 ##✅ frontend/requirements.txt
 txt
 Copy code
@@ -73,10 +77,14 @@ PGPASSWORD=your_pg_password
 PGHOST=your_pg_host
 PGDATABASE=your_database_name
 PGSSLMODE=require"""
+---
+
 ##🐳 Run with Docker
 bash
 Copy code
 docker-compose up --build
+---
+
 ##🧪 Run Locally Without Docker
 ▶️ Backend (FastAPI)
 bash
@@ -84,12 +92,16 @@ Copy code
 cd backend
 pip install -r requirements.txt
 uvicorn main:app --reload
+---
+
 🖥️ Frontend (Streamlit)
 bash
 Copy code
 cd frontend
 pip install -r requirements.txt
 streamlit run app.py
+---
+
 ##📄 PDF Reports
 Automatically saved to: assets/pdfs/
 
@@ -100,6 +112,8 @@ Channel name, stats, and top videos
 AI-generated content analysis
 
 Strategy recommendations
+---
+
 ##🔑 How to Get a YouTube Data API Key
 📌 Step-by-Step:
 Go to Google Cloud Console
@@ -136,6 +150,8 @@ Click on the API key → “Restrict Key”
 Set Application Restrictions to "None" or "HTTP referrers"
 
 Set API Restrictions to: ✅ YouTube Data API v3
+---
+
 ##🤖 How to Get a Gemini API Key (Google AI)
 📌 Step-by-Step:
 Go to Google AI Studio
@@ -150,10 +166,14 @@ A key will be shown. Copy it. This is your GEMINI_API_KEY
 (Optional): Read API usage limits
 🔗 https://ai.google.dev/pricing
 ##🛡️ Where to Store These Keys
+---
+
 Place them in a .env file in your project root:
 
 ini
 Copy code
+---
+
 YOUTUBE_API_KEY=your_actual_youtube_api_key
 GEMINI_API_KEY=your_actual_gemini_api_key
 Your backend will load this securely using python-dotenv
