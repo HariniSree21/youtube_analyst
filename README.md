@@ -87,7 +87,6 @@ PGSSLMODE=require"""
 ##🐳 Run with Docker
 ```
 bash
-Copy code
 docker-compose up --build
 ```
 ---
@@ -96,7 +95,6 @@ docker-compose up --build
 ```
 ▶️ Backend (FastAPI)
 bash
-Copy code
 cd backend
 pip install -r requirements.txt
 uvicorn main:app --reload
@@ -106,7 +104,7 @@ uvicorn main:app --reload
 🖥️ Frontend (Streamlit)
 ```
 bash
-Copy code
+
 cd frontend
 pip install -r requirements.txt
 streamlit run app.py
@@ -166,8 +164,9 @@ Set Application Restrictions to "None" or "HTTP referrers"
 Set API Restrictions to: ✅ YouTube Data API v3
 ```
 ---
-```
+
 ##🤖 How to Get a Gemini API Key (Google AI)
+```
 📌 Step-by-Step:
 Go to Google AI Studio
 🔗 https://aistudio.google.com/app/apikey
