@@ -12,25 +12,70 @@ from backend.crew.agents import (
 )
 
 
+# def run_agents_on_channel(channel_data):
+#     # 1️⃣ Create and run content analysis
+#     content_task = content_analysis_task(channel_data)
+#     analysis_output = Crew(
+#         agents=[content_task.agent],
+#         tasks=[content_task],
+#         verbose=True
+#     ).kickoff()
+
+#     # 2️⃣ Create strategy task using the raw analysis text
+#     strategy_task = strategy_recommendation_task(analysis_output.raw)
+
+#     # 3️⃣ Run strategy task
+#     strategy_output = Crew(
+#         agents=[strategy_task.agent],
+#         tasks=[strategy_task],
+#         verbose=True
+#     ).kickoff()
+
+#     # ✅ Return only .raw as JSON-serializable text
+#     return {
+#         "content_analysis": analysis_output.raw,
+#         "strategy_recommendation": strategy_output.raw
+#     }
+
 def run_agents_on_channel(channel_data):
-    # Create tasks
+    print("[DEBUG] 🚀 Starting run_agents_on_channel")
+
+    # 1️⃣ Content Analysis Task
+    print("[DEBUG] Creating content analysis task...")
     content_task = content_analysis_task(channel_data)
-    strategy_task = strategy_recommendation_task()
 
-    # Create crew
-    crew = Crew(
-        agents=[
-            content_task.agent,
-            strategy_task.agent
-        ],
-        tasks=[
-            content_task,
-            strategy_task
-        ],
+    print("[DEBUG] Running content analysis Crew kickoff...")
+    analysis_output = Crew(
+        agents=[content_task.agent],
+        tasks=[content_task],
         verbose=True
-    )
-    return crew.kickoff()
+    ).kickoff()
 
+    print("[DEBUG] 🧠 Content Analysis Output:\n", analysis_output.raw)
+
+    # 2️⃣ Strategy Recommendation Task
+    print("[DEBUG] Creating strategy recommendation task...")
+    strategy_task = strategy_recommendation_task(analysis_output.raw)
+
+    print("[DEBUG] Strategy task description:", strategy_task.description)
+
+    print("[DEBUG] Running strategy recommendation Crew kickoff...")
+    strategy_output = Crew(
+        agents=[strategy_task.agent],
+        tasks=[strategy_task],
+        verbose=True
+    ).kickoff()
+
+    print("[DEBUG] 🚀 Strategy Recommendation Output:\n", strategy_output.raw)
+
+    # ✅ Final structured return
+    result = {
+        "content_analysis": analysis_output.raw,
+        "strategy_recommendation": strategy_output.raw
+    }
+
+    print("[DEBUG] ✅ Final AI results to return:", result)
+    return result
 
 # ✅ Fixed version
 def run_growth_agent_if_same_domain(channel1, channel2):

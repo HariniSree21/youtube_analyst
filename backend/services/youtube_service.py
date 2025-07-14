@@ -60,12 +60,15 @@ def get_channel_analysis(channel_url):
             id=video_id
         ).execute()["items"][0]
 
+        video_url = f"https://www.youtube.com/watch?v={video_id}"
+
         top_videos.append({
             "title": video_stats["snippet"]["title"],
             "views": video_stats["statistics"].get("viewCount", "0"),
             "likes": video_stats["statistics"].get("likeCount", "0"),
             "comments": video_stats["statistics"].get("commentCount", "0"),
-            "published": video_stats["snippet"]["publishedAt"]
+            "published": video_stats["snippet"]["publishedAt"],
+            "url": video_url  # ✅ add this line
         })
 
     channel_data["top_videos"] = top_videos

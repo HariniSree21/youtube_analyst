@@ -55,7 +55,7 @@ def analyze_channel(request: ChannelRequest):
         # Normalize AI result to dict
         if isinstance(ai_result, dict):
             content_analysis = ai_result.get("content_analysis", "No analysis found.")
-            strategy_recommendations = ai_result.get("strategy_recommendations", "No recommendations found.")
+            strategy_recommendations = ai_result.get("strategy_recommendation", "No recommendations found.")
         elif isinstance(ai_result, list) and len(ai_result) >= 2:
             content_analysis = ai_result[0]
             strategy_recommendations = ai_result[1]
@@ -74,7 +74,7 @@ def analyze_channel(request: ChannelRequest):
             "channel_stats": channel_data,
             "ai_recommendations": {
                 "content_analysis": content_analysis,
-                "strategy_recommendations": strategy_recommendations
+                "strategy_recommendation": strategy_recommendations
             },
             "pdf_path": os.path.abspath(pdf_path)
         }

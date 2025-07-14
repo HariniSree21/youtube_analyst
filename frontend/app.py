@@ -41,13 +41,34 @@ if st.button("Analyze"):
 
             st.write("### 🏆 Top Videos")
             for v in stats.get("top_videos", []):
-                st.markdown(f"- **{v['title']}** — {v['views']} views, {v['likes']} likes, {v['comments']} comments")
+                video_link = v.get("url", "#")
+                title = v.get("title", "Untitled")
+                views = v.get("views", "0")
+                likes = v.get("likes", "0")
+                comments = v.get("comments", "0")
+
+                st.markdown(f"""
+                <div style="border:1px solid #ddd; padding:10px; border-radius:5px; margin-bottom:10px;">
+                    <div style="font-size:16px; font-weight:bold; background-color:#f0f8ff; padding:5px; border-radius:3px;">
+                        {title}
+                    </div>
+                    <div style="margin-top:5px;">
+                        {views} views, {likes} likes, {comments} comments
+                    </div>
+                    <a href="{video_link}" target="_blank">
+                        <button style="background-color:#4CAF50;border:none;color:white;padding:5px 10px;text-align:center;text-decoration:none;display:inline-block;font-size:14px;border-radius:5px;cursor:pointer;margin-top:5px;">
+                            ▶️ Watch
+                        </button>
+                    </a>
+                </div>
+                """, unsafe_allow_html=True)
+
 
             st.write("### 🧠 Content Analysis")
             st.markdown(ai.get("content_analysis", "No content analysis available."))
 
             st.write("### 🚀 Strategy Recommendations")
-            st.markdown(ai.get("strategy_recommendations", "No recommendations available."))
+            st.markdown(ai.get("strategy_recommendation", "No recommendations available."))
 
             # PDF Download
             pdf_path = data.get("pdf_path")
