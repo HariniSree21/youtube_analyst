@@ -11,32 +11,6 @@ from backend.crew.agents import (
     growth_recommendation_agent
 )
 
-
-# def run_agents_on_channel(channel_data):
-#     # 1️⃣ Create and run content analysis
-#     content_task = content_analysis_task(channel_data)
-#     analysis_output = Crew(
-#         agents=[content_task.agent],
-#         tasks=[content_task],
-#         verbose=True
-#     ).kickoff()
-
-#     # 2️⃣ Create strategy task using the raw analysis text
-#     strategy_task = strategy_recommendation_task(analysis_output.raw)
-
-#     # 3️⃣ Run strategy task
-#     strategy_output = Crew(
-#         agents=[strategy_task.agent],
-#         tasks=[strategy_task],
-#         verbose=True
-#     ).kickoff()
-
-#     # ✅ Return only .raw as JSON-serializable text
-#     return {
-#         "content_analysis": analysis_output.raw,
-#         "strategy_recommendation": strategy_output.raw
-#     }
-
 def run_agents_on_channel(channel_data):
     print("[DEBUG] 🚀 Starting run_agents_on_channel")
 
@@ -130,3 +104,15 @@ def run_growth_agent_if_same_domain(channel1, channel2):
 
     # If not similar domains, return None to skip growth suggestion
     return None
+
+from backend.crew.tasks import video_analysis_task
+
+def run_agents_on_video(video_data):
+    task = video_analysis_task(video_data)
+    analysis_output = Crew(
+        agents=[task.agent],
+        tasks=[task],
+        verbose=True
+    ).kickoff()
+
+    return analysis_output.raw

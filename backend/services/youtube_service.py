@@ -1,14 +1,17 @@
 # backend/services/youtube_service.py
 
 import os
+import re
 from googleapiclient.discovery import build
 from backend.config import Config
-API_KEY = Config.YOUTUBE_API_KEY
 from google.auth.credentials import AnonymousCredentials
-youtube =build("youtube", "v3", credentials=AnonymousCredentials(), developerKey=API_KEY)
+
+API_KEY = Config.YOUTUBE_API_KEY
+youtube = build("youtube", "v3", credentials=AnonymousCredentials(), developerKey=API_KEY)
+
 
 def extract_channel_id(channel_url):
-    """Extracts channel ID from full URL if needed"""
+    """Extracts channel ID from full URL if needed."""
     if "channel/" in channel_url:
         return channel_url.split("channel/")[1].split("/")[0]
     elif "user/" in channel_url or "@":
@@ -21,6 +24,26 @@ def extract_channel_id(channel_url):
         ).execute()
         return response["items"][0]["snippet"]["channelId"]
     return channel_url
+
+
+def extract_video_id(video_url):
+    """Extracts video ID from various YouTube URL formats."""
+    # For standard watch URLs
+    watch_match = re.search(r"v=([a-zA-Z0-9_-]{11})", video_url)
+    if watch_match:
+        return watch_match.group(1)
+
+    # For youtu.be short URLs
+    short_match = re.search(r"youtu\.be/([a-zA-Z0-9_-]{11})", video_url)
+    if short_match:
+        return short_match.group(1)
+
+    # If only video ID is passed
+    if len(video_url) == 11:
+        return video_url
+
+    raise ValueError("Invalid YouTube video URL format.")
+
 
 def get_channel_analysis(channel_url):
     channel_id = extract_channel_id(channel_url)
@@ -68,7 +91,7 @@ def get_channel_analysis(channel_url):
             "likes": video_stats["statistics"].get("likeCount", "0"),
             "comments": video_stats["statistics"].get("commentCount", "0"),
             "published": video_stats["snippet"]["publishedAt"],
-            "url": video_url  # ✅ add this line
+            "url": video_url
         })
 
     channel_data["top_videos"] = top_videos
@@ -87,3 +110,44 @@ def compare_two_channels(channel_urls):
             "top_video_views": channel_data["top_videos"][0]["views"] if channel_data["top_videos"] else "0"
         })
     return result
+
+
+def get_video_details(video_url):
+    video_id = extract_video_id(video_url)
+
+    video_response = youtube.videos().list(
+        part="snippet,statistics",
+        id=video_id
+    ).execute()
+
+    if not video_response["items"]:
+        raise Exception("Video not found.")
+
+    video_info = video_response["items"][0]
+    snippet = video_info["snippet"]
+    stats = video_info["statistics"]
+
+    # Get top 20 comments
+    comments = []
+    try:
+        comment_response = youtube.commentThreads().list(
+            part="snippet",
+            videoId=video_id,
+            maxResults=20
+        ).execute()
+
+        for item in comment_response["items"]:
+            comments.append(item["snippet"]["topLevelComment"]["snippet"]["textDisplay"])
+
+    except Exception as e:
+        comments.append("No comments fetched or comments disabled.")
+
+    return {
+        "video_id": video_id,
+        "title": snippet.get("title"),
+        "description": snippet.get("description"),
+        "views": stats.get("viewCount"),
+        "likes": stats.get("likeCount"),
+        "comments_count": stats.get("commentCount"),
+        "comments": comments
+    }

@@ -6,13 +6,12 @@ from frontend_utils import plot_bar_comparison
 import os
 API_URL = os.getenv("API_URL", "http://backend:8000")
 
-
 # Page config
 st.set_page_config(page_title="YouTube Analyzer", page_icon="📊", layout="wide")
 
 # ---- Sidebar Navigation ----
 st.sidebar.title("📋 Navigation")
-page = st.sidebar.radio("Choose an option:", ["🔍 Analyze a Channel", "⚔️ Compare Two Channels"])
+page = st.sidebar.radio("Choose an option:", ["🔍 Analyze a Channel", "⚔️ Compare Two Channels", "🎬 Analyze a Video","🎥 Compare Two Videos" ])
 
 # ---- Initialize session state ----
 if "analyze_result" not in st.session_state:
@@ -63,8 +62,15 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---- App Title ----
-st.markdown('<div class="main-title">📊 YouTube Channel Analyzer </div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">📊 YouTube Channel and Video Analyzer </div>', unsafe_allow_html=True)
 st.caption("AI-powered insights, growth recommendations, and visual analytics for YouTube channels.")
+
+st.markdown("""
+<div style='padding: 10px; background-color: #fff3cd; color: #856404; border-radius: 5px; border: 1px solid #ffeeba;'>
+🌞 For the best visual experience, please switch to Light Mode using the settings at the top-right.
+</div>
+""", unsafe_allow_html=True)
+
 
 # -------------------------
 # Page 1: Analyze a Channel
@@ -210,3 +216,90 @@ elif page == "⚔️ Compare Two Channels":
                 st.info(f"📌 {growth_tip['summary']}")
             if growth_tip.get("recommendations"):
                 st.markdown(growth_tip["recommendations"])
+elif page == "🎬 Analyze a Video":
+    st.markdown("<div class='section-heading'>🎬 Analyze a Video</div>", unsafe_allow_html=True)
+
+    with st.container():
+        video_url = st.text_input("Enter YouTube Video URL", placeholder="https://www.youtube.com/watch?v=...")
+
+    if st.button("🚀 Analyze Video", use_container_width=True):
+        if not video_url.strip():
+            st.warning("⚠️ Please enter a valid YouTube video URL.")
+        else:
+            with st.spinner("🔎 Analyzing video..."):
+                try:
+                    response = requests.post(f"{API_URL}/analyze_video", json={"video_url": video_url})
+                    if response.status_code == 200:
+                        data = response.json()
+                        st.success("✅ Video analysis completed!")
+
+                        stats = data.get("video_stats", {})
+                        ai = data.get("ai_analysis", {})
+
+                        st.markdown(f"### 🎯 {stats.get('title')}")
+                        st.write(f"**Views:** {stats.get('views')}")
+                        st.write(f"**Likes:** {stats.get('likes')}")
+                        st.write(f"**Comments Count:** {stats.get('comments_count')}")
+
+                        st.markdown("### 🧠 AI Video Analysis")
+                        st.info(ai)
+
+                    else:
+                        st.error(f"❌ Error {response.status_code}: {response.json().get('detail')}")
+
+                except Exception as e:
+                    st.error(f"🚫 Failed to connect to backend: {e}")
+elif page == "🎥 Compare Two Videos":
+    st.markdown("<div class='section-heading'>🎥 Compare Two Videos Side by Side</div>", unsafe_allow_html=True)
+
+    with st.container():
+        col1, col2 = st.columns(2)
+        with col1:
+            video1_url = st.text_input("Video 1 URL", placeholder="https://www.youtube.com/watch?v=...", key="v1")
+        with col2:
+            video2_url = st.text_input("Video 2 URL", placeholder="https://www.youtube.com/watch?v=...", key="v2")
+
+    if st.button("⚔️ Compare Videos", use_container_width=True):
+        if not video1_url or not video2_url:
+            st.warning("⚠️ Please enter both video URLs.")
+        else:
+            with st.spinner("🔬 Comparing videos and generating recommendations..."):
+                try:
+                    response = requests.post(
+                        f"{API_URL}/compare_videos_recommendation",
+                        json={"video1_url": video1_url, "video2_url": video2_url}
+                    )
+                    if response.status_code == 200:
+                        data = response.json()
+                        v1 = data.get("video1", {})
+                        v2 = data.get("video2", {})
+                        recommendation = data.get("recommendation", "No recommendation generated.")
+
+                        st.success("✅ Videos Compared Successfully!")
+
+                        # Display videos side by side
+                        col1, col2 = st.columns(2)
+
+                        with col1:
+                            st.markdown(f"### 🎬 Video 1: {v1.get('title', 'No title')}")
+                            st.write(f"**Views:** {v1.get('views', '-')}, **Likes:** {v1.get('likes', '-')}, **Comments:** {v1.get('comments_count', '-')}")
+                            st.write(v1.get("description", "No description available."))
+                            if v1.get("url"):
+                                st.video(v1.get("url"))
+
+                        with col2:
+                            st.markdown(f"### 🎬 Video 2: {v2.get('title', 'No title')}")
+                            st.write(f"**Views:** {v2.get('views', '-')}, **Likes:** {v2.get('likes', '-')}, **Comments:** {v2.get('comments_count', '-')}")
+                            st.write(v2.get("description", "No description available."))
+                            if v2.get("url"):
+                                st.video(v2.get("url"))
+
+                        # Display Gemini Recommendation
+                        st.markdown("### 🧠 Gemini Recommendation")
+                        st.info(recommendation)
+
+                    else:
+                        st.error(f"❌ Error {response.status_code}: {response.json().get('detail')}")
+
+                except Exception as e:
+                    st.error(f"🚫 Failed to connect to backend: {e}")

@@ -70,3 +70,26 @@ def strategy_recommendation_task(analysis_summary):
         agent=strategy_advisor_agent,
         expected_output="A clear, practical, structured growth plan as described above."
     )
+
+def video_analysis_task(video_data):
+    return Task(
+        description=f"""
+        You are a YouTube Video Analyst.
+
+        Analyze the following video details:
+
+        Title: {video_data['title']}
+        Description: {video_data['description']}
+        Comments:
+        {video_data['comments']}
+
+        **Provide output structured as:**
+
+        1. Overall Sentiment (Positive, Negative, or Mixed)
+        2. Top Strengths (2-3 bullet points)
+        3. Top Weaknesses (2-3 bullet points)
+        4. Suggested Improvements (2-3 actionable suggestions)
+        """,
+        agent=content_analyst_agent,
+        expected_output="A structured video analysis as described above."
+    )

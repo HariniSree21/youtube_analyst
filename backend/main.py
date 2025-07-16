@@ -5,9 +5,17 @@ from backend.crew.crew_runner import run_growth_agent_if_same_domain, run_agents
 from backend.services.youtube_service import get_channel_analysis
 from backend.utils.pdf_generator import generate_pdf
 from backend.utils.growth_agent_runner import run_in_subprocess
+from backend.services.youtube_service import get_video_details
+from backend.crew.crew_runner import run_agents_on_video
+from backend.services.gemini_service import recommend_best_video_gemini
+from fastapi import Body
 import os
+
 from fastapi.responses import FileResponse
 app = FastAPI()
+
+class VideoRequest(BaseModel):
+    video_url: str
 
 class ChannelRequest(BaseModel):
     channel_url: str
@@ -85,3 +93,60 @@ def download_pdf(filename: str):
         media_type='application/pdf',
         filename=filename
     )
+
+@app.post("/analyze_video")
+def analyze_video(request: VideoRequest):
+    try:
+        video_data = get_video_details(request.video_url)
+        ai_result = run_agents_on_video(video_data)
+
+        return {
+            "video_stats": video_data,
+            "ai_analysis": ai_result
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/compare_videos_recommendation")
+def compare_videos_recommendation(videos: dict = Body(...)):
+    """
+    Expects:
+    {
+        "video1_url": "https://youtu.be/....",
+        "video2_url": "https://youtu.be/...."
+    }
+    """
+    try:
+        v1_url = videos.get("video1_url")
+        v2_url = videos.get("video2_url")
+
+        v1_data = get_video_details(v1_url)
+        v2_data = get_video_details(v2_url)
+
+        # Prepare text for Gemini prompt
+        text = f"""
+        Video 1:
+        Title: {v1_data['title']}
+        Description: {v1_data['description']}
+        Likes: {v1_data['likes']}
+        Comments: {v1_data['comments_count']}
+
+        Video 2:
+        Title: {v2_data['title']}
+        Description: {v2_data['description']}
+        Likes: {v2_data['likes']}
+        Comments: {v2_data['comments_count']}
+        """
+
+        recommendation = recommend_best_video_gemini(text)
+
+        return {
+            "video1": v1_data,
+            "video2": v2_data,
+            "recommendation": recommendation
+        }
+
+    except Exception as e:
+        print("❌ Compare videos error:", e)
+        raise HTTPException(status_code=500, detail=str(e))
